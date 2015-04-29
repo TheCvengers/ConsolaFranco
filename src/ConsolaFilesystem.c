@@ -49,9 +49,9 @@ int main(void) {
 			printf("el comando es muy largo\n");
 		} else {
 			x = contarPalabras(comando);
-			p = malloc(x * (sizeof(char*)));      // creo un puntero a puntero para guardar los punteros a las palabras
-			for (i = 0; i < x; i++) {             // que me crea darPalabra para poder hacerles free despues
-				p[i] = darPalabra(comando, i + 1);// p[0] es el puntero a la primera palabra, p[1] a la segunda, y asi
+			p = malloc(x * (sizeof(char*))); // creo un puntero a puntero para guardar los punteros a las palabras
+			for (i = 0; i < x; i++) { // que me crea darPalabra para poder hacerles free despues
+				p[i] = darPalabra(comando, i + 1); // p[0] es el puntero a la primera palabra, p[1] a la segunda, y asi
 			}
 //			for (i = 0; i < x; i++) {
 //				printf("%s\n",p[i]);
@@ -71,6 +71,11 @@ int main(void) {
 				printf("rmnodo/1\n");
 				printf("exit\n");
 			} else if (!strcmp("exit", p[0])) {
+				for (i = 0; i < x; i++) { // libera la memoria que aloco en darPalabra(2)
+					free(p[i]); // aca a veces tira el free(): invalid next size (fast)
+				}          // lo pude reproducir una sola vez despues de tirarle
+				free(p);                  // un monton de comandos
+				free(comando);
 				return 0;
 			} else if (!strcmp(p[0], "format")) {
 				if (x < 1) {
@@ -148,8 +153,8 @@ int main(void) {
 				printf("no entiendo ese comando\n");
 		}
 		for (i = 0; i < x; i++) { // libera la memoria que aloco en darPalabra(2)
-			free(p[i]);           // aca a veces tira el free(): invalid next size (fast)
-		}                         // lo pude reproducir una sola vez despues de tirarle
+			free(p[i]);  // aca a veces tira el free(): invalid next size (fast)
+		}                  // lo pude reproducir una sola vez despues de tirarle
 		free(p);                  // un monton de comandos
 		free(comando);
 	}
@@ -203,7 +208,9 @@ char* darPalabra(char* str, int pos) {
 }
 //printea el md5 del archivo por system call
 void darMd5(char* s) {
-	char *md5 = strdup("openssl dgst -md5 -hex ");
+	char *md5 = malloc(128);
+	strcpy(md5, "openssl dgst -md5 -hex ");
 	strcat(md5, s);
 	system(md5);
+	free(md5);
 }

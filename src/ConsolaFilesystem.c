@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <commons/string.h>
-#define STRLEN 128
+
 /*void formatearMdfs();
  void eliminarArchivo();
  void renombrarArchivo();
@@ -28,7 +28,6 @@
  void agregarNodo();
  void eliminarNodo();*/
 
-int contarSpliteado(char**);
 void darMd5();
 char* darPalabra(char*, int);
 int contarPalabras(char*);
@@ -149,9 +148,9 @@ int main(void) {
 				printf("no entiendo ese comando\n");
 		}
 		for (i = 0; i < x; i++) { // libera la memoria que aloco en darPalabra(2)
-			free(p[i]);
-		}
-		free(p);
+			free(p[i]);           // aca a veces tira el free(): invalid next size (fast)
+		}                         // lo pude reproducir una sola vez despues de tirarle
+		free(p);                  // un monton de comandos
 		free(comando);
 	}
 	return 0;

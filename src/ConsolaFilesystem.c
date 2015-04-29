@@ -42,15 +42,17 @@ int main(void) {
 			"Para ver los todos los comandos use el comando ayuda\n****************************************************\n");
 	while (1) {
 		printf("> ");
-		comando = malloc(128);
-		scanf("%128[^\n]s", comando);
+		comando = malloc(130);
+		scanf("%129[^\n]s", comando);
 		getchar();
 		if (contarLetras(comando) > 128) { // los comandos tienen limite de 128 caracteres (lo podemos agrandar)
 			printf("el comando es muy largo\n");
-		} else {
+			while (getchar() != '\n') { // este while consume caracteres que quedaron colgados en stdin, lo puse porque
+			} //                           cuando ponia un string de mas de 128 caracteres y lo mandaba a escribir de nuevo
+		} else { //                        en lugar de guardar lo que escrbia el usuario me guardaba los caracteres que se habian pasado de 128 antes
 			x = contarPalabras(comando);
-			p = malloc(x * (sizeof(char*))); // creo un puntero a puntero para guardar los punteros a las palabras
-			for (i = 0; i < x; i++) { // que me crea darPalabra para poder hacerles free despues
+			p = malloc(x * (sizeof(char*))); //       creo un puntero a puntero para guardar los punteros a las palabras
+			for (i = 0; i < x; i++) { //              que me crea darPalabra para poder hacerles free despues
 				p[i] = darPalabra(comando, i + 1); // p[0] es el puntero a la primera palabra, p[1] a la segunda, y asi
 			}
 //			for (i = 0; i < x; i++) {
@@ -72,8 +74,8 @@ int main(void) {
 				printf("exit\n");
 			} else if (!strcmp("exit", p[0])) {
 				for (i = 0; i < x; i++) { // libera la memoria que aloco en darPalabra(2)
-					free(p[i]); // aca a veces tira el free(): invalid next size (fast)
-				}          // lo pude reproducir una sola vez despues de tirarle
+					free(p[i]); //           aca a veces tira el free(): invalid next size (fast)
+				} //                lo pude reproducir una sola vez despues de tirarle
 				free(p);                  // un monton de comandos
 				free(comando);
 				return 0;
@@ -151,12 +153,13 @@ int main(void) {
 				printf("te saco el nodo %s\n", p[1]);
 			} else
 				printf("no entiendo ese comando\n");
+			for (i = 0; i < x; i++) { // libera la memoria que aloco en darPalabra(2)
+				free(p[i]); //           aca a veces tira el free(): invalid next size (fast)
+			}   //            lo pude reproducir una sola vez despues de tirarle
+			free(p);                  // un monton de comandos
+			free(comando);
 		}
-		for (i = 0; i < x; i++) { // libera la memoria que aloco en darPalabra(2)
-			free(p[i]);  // aca a veces tira el free(): invalid next size (fast)
-		}                  // lo pude reproducir una sola vez despues de tirarle
-		free(p);                  // un monton de comandos
-		free(comando);
+
 	}
 	return 0;
 }
@@ -165,6 +168,8 @@ int main(void) {
 // funciona bien si pones muchos espacios juntos por error
 int contarPalabras(char* str) {
 	int palabras = 1, i = 0;
+	while (str[i] == '\ ') // se mueve hasta la primer letra si empieza con espacios
+		i++;
 	while (str[i] != '\0') {
 		if (str[i] == '\ ' && str[i + 1] != '\ ' && str[i + 1] != '\0')
 			palabras++;
